@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UNiagaraSystem;
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayEffect;
@@ -25,12 +26,13 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	/** Combat Interface */
-	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
-	virtual void Die() override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;	
+	virtual void Die() override;	
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
-	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation()override;
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	/** end Combat Interface */
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -42,9 +44,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
 
@@ -53,7 +55,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName RightHandSocketName;
-	
+
 	bool bDead = false;
 
 	UPROPERTY()
@@ -72,8 +74,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
-
-
+	
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 	virtual void InitializeDefaultAttributes() const;
 
@@ -83,19 +84,21 @@ protected:
 
 	void Dissolve();
 
-	// make the void dissolve timeline in cpp instead of bp for performance thingy
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	UNiagaraSystem* BloodEffect;
+
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
