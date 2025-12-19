@@ -114,7 +114,7 @@ void AAuraEnemy::BeginPlay()
 			}
 		);
 		
-		AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+		AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
 		this,
 		&AAuraEnemy::HitReactTagChanged
 	);

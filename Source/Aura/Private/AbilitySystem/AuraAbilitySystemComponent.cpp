@@ -24,6 +24,7 @@ void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 		if (const UAuraGameplayAbility* AuraAbility = Cast<UAuraGameplayAbility>(AbilitySpec.Ability))
 		{
 			AbilitySpec.DynamicAbilityTags.AddTag(AuraAbility->StartupInputTag);
+			AbilitySpec.DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Ability_Status_Equipped);
 			GiveAbility(AbilitySpec);
 		}
 	}
@@ -90,7 +91,7 @@ void UAuraAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
  	{
  		for (FGameplayTag Tag : AbilitySpec.Ability->AbilityTags)
  		{
- 			if (Tag.MatchesTag(FAuraGameplayTags::Get().Abilities))
+ 			if (Tag.MatchesTag(FAuraGameplayTags::Get().Ability_Root))
  			{
  				return Tag;
  			}
@@ -103,13 +104,25 @@ void UAuraAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
  {
  	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
  	{
- 		if (Tag.MatchesTag(FAuraGameplayTags::Get().InputTag))
+ 		if (Tag.MatchesTag(FAuraGameplayTags::Get().InputTag_Root))
  		{
  			return Tag;
  		}
  	}
  	return FGameplayTag();
  }
+
+FGameplayTag UAuraAbilitySystemComponent::GetStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag StatusTag  : AbilitySpec.DynamicAbilityTags)
+	{
+		if (StatusTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Status"))))
+		{
+			return StatusTag;
+		}
+	}
+	return FGameplayTag();
+}
 
 void UAuraAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {

@@ -133,6 +133,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	Super::PostGameplayEffectExecute(Data);
 	
 	FEffectProperties Props;
+	
 	SetEffectProperties(Data, Props);
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
@@ -164,9 +165,12 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			}
 			else
 			{
-				FGameplayTagContainer TagContainer;
-				TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
-				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+				FGameplayTagContainer Tags;
+				Tags.AddTag(FAuraGameplayTags::Get().Ability_HitReact);
+				if (Props.TargetASC)
+				{
+					Props.TargetASC->TryActivateAbilitiesByTag(Tags);
+				}
 			}
 			
 			const bool bBlock = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
